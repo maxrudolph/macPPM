@@ -25,7 +25,7 @@ typedef struct
     unsigned int outputEnabled;
 } PASBuddyBox;
 
-void initializeBuddyBoxThread(PASBuddyBox *pasBB);
+void initializeBuddyBoxThread(PASBuddyBox *pasBB, int testmode);
 
 void startBuddyBoxThread(PASBuddyBox *pasBB);
 

@@ -12,12 +12,15 @@
 
 #include <signal.h>
 
-void initializeBuddyBoxThread(PASBuddyBox *pasBB)
+void initializeBuddyBoxThread(PASBuddyBox *pasBB, int testmode)
 {    
     initializePortAudioStream(&pasBB->pas, pasBB->sampleRate);
     pasBB->running = 0;
     pasBB->inputEnabled = 1;
-    pasBB->outputEnabled = 1;
+    if (testmode)
+        pasBB->outputEnabled = 1;
+    else
+        pasBB->outputEnabled = 0;
 }
 
 void startBuddyBoxThread(PASBuddyBox *pasBB)
