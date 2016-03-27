@@ -16,5 +16,5 @@
 7. If you don't have a NineEagles J6 Pro like me, you may have to adjust the code in main.c (the usb descriptor and how the ppm channels are mapped to the virtual joystick in the while loop at the bottom).
 
 # Credits
-This was made possible by combining the project BuddyBox-PPM by Nicholas Robinson
-with the example code from unbit's foohid project. I wrote some glue to stick them together and gave it a catchier name.
+This was made possible by combining https://github.com/nicholasrobinson/BuddyBox-PPM
+with the code from http://github.com/unbit/foohid. I wrote some glue to stick them together and gave it a catchier name (in my opinion, anyways).
