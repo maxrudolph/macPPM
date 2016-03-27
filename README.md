@@ -2,12 +2,12 @@
 
 * Virtual joystick for OS X using the PPM output of RC transmitters. Tested with a NineEagles J6 Pro on OS X 10.11.4.
 
-* Licence exception: If you are a developer of a commercial mac helicopter sim you are not allowd to use the parts of this software written by me, unless
-   I get a free life-time license key!
+* License exception: If you are a developer of a commercial mac helicopter sim you are not allowd to use the parts of this software written by me, unless
+   I get a free life-time license key ;-)
 
 # Installation
 1. Download and install foohid.kext from http://github.com/unbit/foohid/releases
-2. Download macPPM. It includes a binary of libportaudio. If you prefer to build this library on your own feel free to do so.
+2. Download macPPM source or the release. It includes a binary of libportaudio, which the makefile expects in the src directory. If you prefer to build this library on your own feel free to do so.
 3. Make [or buy] a nice cable connecting your Transmitter to your soundcard input
 4. Ensure that the audio input device is correctly set in the system preferences 	       
    (i.e. not 'microphone')
