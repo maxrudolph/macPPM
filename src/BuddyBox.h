@@ -29,7 +29,7 @@ static const float SIGNAL_HIGH_FLOAT                    = 1.0f;    // Experiment
 static const float SIGNAL_LOW_FLOAT                     = -1.0f;     // Experimentally: -0.23f;
 
 typedef struct
-{
+{	
     unsigned int active;
     unsigned int negativeShift;
     unsigned int sampleRate;

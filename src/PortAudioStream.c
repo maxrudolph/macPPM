@@ -15,7 +15,7 @@
 
 
 
-void initializePortAudioStream(PortAudioStream *pas, unsigned int sampleRate)
+void initializePortAudioStream(PortAudioStream *pas, unsigned int sampleRate, unsigned int deviceChannel )
 {
     PaStreamParameters inputParameters, outputParameters;
     
@@ -25,7 +25,7 @@ void initializePortAudioStream(PortAudioStream *pas, unsigned int sampleRate)
     initializePortAudio(pas);
     configurePortAudioInputParameters(&inputParameters);
     configurePortAudioOutputParameters(&outputParameters);
-    openPortAudioStream(pas, outputParameters, inputParameters);
+    openPortAudioStream(pas, outputParameters, inputParameters, deviceChannel);
 }
 
     void allocatePortAudioStreamBuffer(PortAudioStream *pas)
@@ -87,18 +87,21 @@ void initializePortAudioStream(PortAudioStream *pas, unsigned int sampleRate)
         outputParameters->hostApiSpecificStreamInfo = NULL;
     }
 
-    void openPortAudioStream(PortAudioStream *pas, PaStreamParameters outputParameters, PaStreamParameters inputParameters)
+    void openPortAudioStream(PortAudioStream *pas, PaStreamParameters outputParameters, PaStreamParameters inputParameters, unsigned int deviceChannel)
     {
         PaError err;
        
         PaMacCoreStreamInfo data;
-    	const SInt32   map[] = { 1, -1 }; // swap input channel (i.e. left/right)
+        
+        if (deviceChannel){
+        const SInt32   map[] = { 1, -1 }; // swap input channel (i.e. left/right)
         PaMacCore_SetupStreamInfo( &data, 0 ); // mit flag PaMacCore_GetChannelName statt 0 nur 'reale' sample rates moelich. weniger cpu mit 0
         PaMacCore_SetupChannelMap(&data, map, 2 );
          
        	inputParameters.hostApiSpecificStreamInfo = &data;
        	outputParameters.hostApiSpecificStreamInfo = &data; //error if not set for output as well
-       		
+       	}
+       	
         err = Pa_OpenStream(
             &pas->stream,
             &inputParameters,

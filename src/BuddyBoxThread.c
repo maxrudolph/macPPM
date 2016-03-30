@@ -14,7 +14,7 @@
 
 void initializeBuddyBoxThread(PASBuddyBox *pasBB, int testmode)
 {    
-    initializePortAudioStream(&pasBB->pas, pasBB->sampleRate);
+    initializePortAudioStream(&pasBB->pas, pasBB->sampleRate, pasBB->deviceChannel);
     pasBB->running = 0;
     pasBB->inputEnabled = 1;
     if (testmode)

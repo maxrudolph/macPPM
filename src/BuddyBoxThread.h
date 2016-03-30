@@ -19,6 +19,7 @@ typedef struct
     PortAudioStream pas;
     BuddyBox bb;
     pthread_t buddyBoxThread;
+    unsigned int deviceChannel;
     unsigned int sampleRate;
     unsigned int running;
     unsigned int inputEnabled;

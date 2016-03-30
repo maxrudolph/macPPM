@@ -142,18 +142,23 @@ int main(int argc, const char * argv[])
     
     PASBuddyBox pasBB;
     pasBB.sampleRate = DEFAULT_SAMPLE_RATE;
-
-    if (argc>1) {
-    if (!strcmp(argv[1],"test")) {
-        testmode = 1;
-        printf ("enabling output for testing purposes %s \n", argv[argc-1]);
-        pasBB.sampleRate = (argc > 2) ? (unsigned int) strtol(argv[argc-1], NULL, 0) : DEFAULT_SAMPLE_RATE;
-    } else {
-        pasBB.sampleRate = (unsigned int) strtol(argv[argc-1], NULL, 0);
-    }
+ 	pasBB.deviceChannel = 1;
+    
+    int opt=0;
+    while ((opt = getopt(argc, (char * const *) argv, "tc")) != -1) {
+        switch (opt) {
+        case 't': testmode = 1; break;
+        case 'c': pasBB.deviceChannel = 0; break;
+        default:
+            fprintf(stderr, "Usage: %s [-tc] [sample rate]\n", argv[0]);
+            exit(1);
+        }
     }
     
-    printf ("Usage: macPPM [test] [sample rate] \n current sample rate: %d   The deprecation warning below is not my buisness...\n\n", pasBB.sampleRate);
+    if (optind < argc)
+    	pasBB.sampleRate = (unsigned int) strtol(argv[optind], NULL, 0);
+    
+    printf ("Usage: macPPM [-t(est) -c(hannel)] [sample rate] \n current sample rate: %d   \n\n", pasBB.sampleRate);
     initializeBuddyBoxThread(&pasBB, testmode);
     printf ("\n"); // to set output apart from the deprecation warning of libportaudio
     
