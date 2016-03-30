@@ -20,7 +20,7 @@
 #include <string.h>
 #include <IOKit/IOKitLib.h>
 
-static const unsigned int DEFAULT_SAMPLE_RATE = 124000;
+static const unsigned int DEFAULT_SAMPLE_RATE = 96000;
 
 static unsigned int running = 1;
 
@@ -205,8 +205,8 @@ int main(int argc, const char * argv[])
     
     ret = IOConnectCallScalarMethod(connect, FOOHID_CREATE, input, input_count, NULL, 0);
     if (ret != KERN_SUCCESS) {
-        printf("Unable to create HID device. \n");
-        exit(1);
+        printf("Unable to create HID device - hope that it exists already. \n");
+       // exit(1);
     }
     
     // Arguments to be passed through the HID message.

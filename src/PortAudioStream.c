@@ -7,10 +7,13 @@
 //
 
 #include "PortAudioStream.h"
+#include "pa_mac_core.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+
 
 void initializePortAudioStream(PortAudioStream *pas, unsigned int sampleRate)
 {
@@ -67,7 +70,7 @@ void initializePortAudioStream(PortAudioStream *pas, unsigned int sampleRate)
             }
 
     void configurePortAudioInputParameters(PaStreamParameters *inputParameters)
-    {
+    {   
         inputParameters->device = Pa_GetDefaultInputDevice();
         inputParameters->channelCount = NUM_CHANNELS;
         inputParameters->sampleFormat = PA_SAMPLE_TYPE;
@@ -87,7 +90,15 @@ void initializePortAudioStream(PortAudioStream *pas, unsigned int sampleRate)
     void openPortAudioStream(PortAudioStream *pas, PaStreamParameters outputParameters, PaStreamParameters inputParameters)
     {
         PaError err;
-        
+       
+        PaMacCoreStreamInfo data;
+    	const SInt32   map[] = { 1, -1 }; // swap input channel (i.e. left/right)
+        PaMacCore_SetupStreamInfo( &data, 0 ); // mit flag PaMacCore_GetChannelName statt 0 nur 'reale' sample rates moelich. weniger cpu mit 0
+        PaMacCore_SetupChannelMap(&data, map, 2 );
+         
+       	inputParameters.hostApiSpecificStreamInfo = &data;
+       	outputParameters.hostApiSpecificStreamInfo = &data; //error if not set for output as well
+       		
         err = Pa_OpenStream(
             &pas->stream,
             &inputParameters,
@@ -98,6 +109,8 @@ void initializePortAudioStream(PortAudioStream *pas, unsigned int sampleRate)
             NULL,               // no callback, use blocking API
             NULL                // no callback, so no callback userData
         );
+       // for(int i=0; i<2; ++i )
+       	//	printf( "channel %d name: %s\n", i, PaMacCore_GetChannelName( PaMacCore_GetStreamInputDevice(&pas), 0, true ) ); //not working....
         if(err != paNoError)
             handlePortAudioStreamInitializationError(pas, err);
         err = Pa_StartStream(pas->stream);
