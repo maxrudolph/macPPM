@@ -1,10 +1,10 @@
-CFLAGS:=-Wall
+CFLAGS:=-Wall -m64 -O3
 CFILES:=$(wildcard src/*.c)
 OBJS:=$(patsubst src/%.c,objs/%.o,$(CFILES))
 HEADERS:=$(wildcard src/*.h)
-INCLUDES:=/usr/local/include
+INCLUDES:=-I/usr/local/include -I../portaudio/include
 LIBS:=$(wildcard $(OS)/*.a)
-LINK_FLAGS:=src/libportaudio.a
+LINK_FLAGS:=../portaudio/lib/.libs/libportaudio.a
 
 OS:=$(shell uname)
 ifeq ($(OS),Darwin)
@@ -21,7 +21,7 @@ objs:
 	mkdir objs
 
 objs/%.o: src/%.c $(HEADERS) objs
-	$(CC) $(CFLAGS) -I $(INCLUDES) -c -o $@ $<
+	$(CC) $(CFLAGS)  $(INCLUDES) -c -o $@ $<
 
 clean:
 	-rm -f macPPM

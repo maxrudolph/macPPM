@@ -36,14 +36,14 @@ typedef struct
     PaStream* stream;
 } PortAudioStream;
 
-void initializePortAudioStream(PortAudioStream *pas, unsigned int sampleRate, unsigned int deviceChannel);
+void initializePortAudioStream(PortAudioStream *pas, unsigned int sampleRate);
     void allocatePortAudioStreamBuffer(PortAudioStream *pas);
     void initializePortAudio(PortAudioStream *pas);
         void handlePortAudioStreamInitializationError(PortAudioStream *pas, PaError err);
             void terminatePortAudioStream(PortAudioStream *pas);
         void configurePortAudioInputParameters(PaStreamParameters *inputParameters);
     void configurePortAudioOutputParameters(PaStreamParameters *outputParameters);
-    void openPortAudioStream(PortAudioStream *pas, PaStreamParameters outputParameters, PaStreamParameters inputParameters, unsigned int deviceChannel);
+    void openPortAudioStream(PortAudioStream *pas, PaStreamParameters outputParameters, PaStreamParameters inputParameters);
 
 unsigned int readPortAudioStream(PortAudioStream *pas);
     unsigned int handlePortAudioStreamFlowError(PortAudioStream *pas, PaError err);

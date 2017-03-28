@@ -20,42 +20,45 @@
 #include <string.h>
 #include <IOKit/IOKitLib.h>
 
-static const unsigned int DEFAULT_SAMPLE_RATE = 96000;
+static const unsigned int DEFAULT_SAMPLE_RATE = 124000;
 
 static unsigned int running = 1;
 
-/*   
- alternative joystick report descriptor:
- 
- 0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
- 0x09, 0x04,                    // USAGE (Joystick)
- 0xa1, 0x01,                    // COLLECTION (Application)
- 0x15, 0x81,                    //   LOGICAL_MINIMUM (-127)
- 0x25, 0x7f,                    //   LOGICAL_MAXIMUM (127)
- 0x05, 0x01,                    //   USAGE_PAGE (Generic Desktop)
- 0x09, 0x01,                    //   USAGE (Pointer)
- 0xa1, 0x00,                    //   COLLECTION (Physical)
- 0x09, 0x30,                    //     USAGE (X)
- 0x09, 0x31,                    //     USAGE (Y)
- 0x09, 0x32,                    //     USAGE (Ry) for throttle 1
- 0x09, 0x33,                    //     USAGE (Rz) for throttle 2
- 0x75, 0x08,                    //     REPORT_SIZE (8)
- 0x95, 0x04,                    //     REPORT_COUNT (2)
- 0x81, 0x02,                    //     INPUT (Data,Var,Abs)
- 0xc0,                          //   END_COLLECTION
- 0x05, 0x09,                    //   USAGE_PAGE (Button)
- 0x19, 0x01,                    //   USAGE_MINIMUM (Button 1)
- 0x29, 0x08,                    //   USAGE_MAXIMUM (Button 8)
- 0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
- 0x25, 0x01,                    //   LOGICAL_MAXIMUM (1)
- 0x75, 0x01,                    //   REPORT_SIZE (1)
- 0x95, 0x08,                    //   REPORT_COUNT (8)
- 0x55, 0x00,                    //   UNIT_EXPONENT (0)
- 0x65, 0x00,                    //   UNIT (None)
- 0x81, 0x02,                    //   INPUT (Data,Var,Abs)
- 0xc0                           // END_COLLECTION
- */
+  
+// alternative joystick report descriptor:
+unsigned char joy_reportdesc[] = {
+0x05, 0x01,        // Usage Page (Generic Desktop Ctrls)
+0x09, 0x04,        // Usage (Joystick)
+0xA1, 0x01,        // Collection (Application)
+0x15, 0x81,        //   Logical Minimum (-127)
+0x25, 0x7F,        //   Logical Maximum (127)
+0x05, 0x01,        //   Usage Page (Generic Desktop Ctrls)
+0x09, 0x01,        //   Usage (Pointer)
+0xA1, 0x00,        //   Collection (Physical)
+0x09, 0x30,        //     Usage (X)
+0x09, 0x31,        //     Usage (Y)
+0x09, 0x32,        //     Usage (Z)
+0x09, 0x33,        //     Usage (Rx)
+0x09, 0x34,        //     Usage (Ry)
+0x75, 0x08,        //     Report Size (8)
+0x95, 0x05,        //     Report Count (4) -> (5)
+0x81, 0x02,        //     Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0xC0,              //   End Collection
+0x05, 0x09,        //   Usage Page (Button)
+0x19, 0x01,        //   Usage Minimum (0x01)
+0x29, 0x08,        //   Usage Maximum (0x08)
+0x15, 0x00,        //   Logical Minimum (0)
+0x25, 0x01,        //   Logical Maximum (1)
+0x75, 0x01,        //   Report Size (1)
+0x95, 0x08,        //   Report Count (8)
+0x55, 0x00,        //   Unit Exponent (0)
+0x65, 0x00,        //   Unit (None)
+0x81, 0x02,        //   Input (Data,Var,Abs,No Wrap,Linear,Preferred State,No Null Position)
+0xC0              // End Collection
 
+// 54 bytes
+};
+   /*
 unsigned char joy_reportdesc[] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x04,                    // USAGE (Joystick)
@@ -86,13 +89,16 @@ unsigned char joy_reportdesc[] = {
     0xc0,                          //   END_COLLECTION
     0xc0                           // END_COLLECTION
 };
+   */
 
 struct joystick_report_t
 {
     int8_t x;
     int8_t y;
+    int8_t z;
+    int8_t rx;
     int8_t ry;
-    int8_t rz;
+
     uint8_t buttons;
 };
 
@@ -142,7 +148,7 @@ int main(int argc, const char * argv[])
     
     PASBuddyBox pasBB;
     pasBB.sampleRate = DEFAULT_SAMPLE_RATE;
- 	pasBB.deviceChannel = 1;
+ 	
     
     int opt=0;
     while ((opt = getopt(argc, (char * const *) argv, "tc")) != -1) {
@@ -231,27 +237,27 @@ int main(int argc, const char * argv[])
         
         while(running && isBuddyBoxThreadRunning(&pasBB))
         {
-            if (testmode)
-                generateOutput(&pasBB);
+            generateOutput(&pasBB);
             
-            if (isBuddyBoxThreadCalibrated(&pasBB)) {
+            if (1 || isBuddyBoxThreadCalibrated(&pasBB)) {
                 if (testmode) {
                   displayInput(&pasBB);
                 
                   unsigned int i, inputChannelCount;
-                
-                  inputChannelCount = getBuddyBoxThreadInputChannelCount(&pasBB);
+		  
+                  inputChannelCount = 8;//getBuddyBoxThreadInputChannelCount(&pasBB);
                   for (i = 0; i < inputChannelCount; i++)
                       printf("%f\t", getBuddyBoxThreadInputChannelValue(&pasBB, i));
                   printf("\n");
                 }
                 // This is for a NineEagles J6 Pro Transmitter (6 channels); may need to adjust for other models
-                joy.buttons = (getBuddyBoxThreadInputChannelValue(&pasBB, 4)>0.5) ? 1:0;
+                //joy.buttons = (getBuddyBoxThreadInputChannelValue(&pasBB, 4)>0.5) ? 1:0;
                 joy.x = (getBuddyBoxThreadInputChannelValue(&pasBB, 0)-0.5) * 255;
                 joy.y = (getBuddyBoxThreadInputChannelValue(&pasBB, 1)-0.5) * 255;
-                joy.ry = (getBuddyBoxThreadInputChannelValue(&pasBB, 3)-0.5) * 255;
-                joy.rz = (getBuddyBoxThreadInputChannelValue(&pasBB, 2)-0.5) * 255;
-                
+                joy.rx = (getBuddyBoxThreadInputChannelValue(&pasBB, 3)-0.5) * 255;
+                joy.ry = (getBuddyBoxThreadInputChannelValue(&pasBB, 5)-0.5) * 255;
+      		joy.z =  (getBuddyBoxThreadInputChannelValue(&pasBB, 2)-0.5) * 255;
+
                 ret = IOConnectCallScalarMethod(connect, FOOHID_SEND, send, send_count, NULL, 0);
                 if (ret != KERN_SUCCESS) {
                     printf("Unable to send message to HID device.\n");
@@ -259,7 +265,7 @@ int main(int argc, const char * argv[])
             }
                 
             
-            usleep(20000);
+            usleep(100);
         }
         
         stopBuddyBoxThread(&pasBB);
